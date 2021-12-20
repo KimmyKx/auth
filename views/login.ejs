@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="https://apis.google.com/js/platform.js" async defer></script>
+    <meta
+      name="google-signin-client_id"
+      content="431330319013-7tkh8ltj18hke4c5rs3b74v5pphikc4t.apps.googleusercontent.com"
+    />
+    <!-- Style CSS -->
+    <link rel="stylesheet" href="/css/style-login.css" />
+    <!-- Icon Fontawesome -->
+    <link
+      rel="stylesheet"
+      href="https://pro.fontawesome.com/releases/v5.10.0/css/all.css"
+      integrity="sha384-AYmEC3Yw5cVb3ZcuHtOA93w35dYTsvhLPVnYs9eStHfGJvOvKxVfELGroGkvsg+p"
+      crossorigin="anonymous"
+    />
+    <title>Chat Bootcamp Login Auth</title>
+  </head>
+  <body>
+    <div class="container">
+      <div class="head">
+        <h2>Selamat Datang Di Chat Bootcamp</h2>
+      </div>
+
+      <!-- <div class="alert-error" role="alert"></div> -->
+
+      <div class="body">
+        <!-- Tag form untuk mengakses email dan password -->
+        <form action="" method="POST">
+          <!-- Input Email -->
+          <input
+            type="email"
+            name="email"
+            class="noTelepon"
+            placeholder="Currently disabled"
+            disabled
+          />
+
+          <!-- Input Password -->
+          <input
+            type="password"
+            name="password"
+            class="password"
+            placeholder="Currently disabled"
+            disabled
+          />
+
+          <!-- Tombol Input -->
+          <button disabled type="submit" name="login" class="input">Login</button>
+        </form>
+
+        <div class="or">
+          <p>atau</p>
+        </div>
+
+        <!-- Kotak Login Google -->
+        <div class="g-signin2" data-onsuccess="onSignIn"></div>
+
+        <!-- Footer -->
+        <footer>
+          <p>
+            Belum mempunyai akun?
+            <a class="footer">Sign Up</a>
+          </p>
+        </footer>
+      </div>
+    </div>
+
+    <!-- Ketika user login menggunakan google account -->
+    <script>
+      function onSignIn(googleUser) {
+        // Google akan mengirimkan token
+        let id_token = googleUser.getAuthResponse().id_token;
+        // Lalu kita kirim token tersebut ke back end kita
+        var xhr = new XMLHttpRequest();
+        xhr.open("POST", "/login");
+        xhr.setRequestHeader("Content-Type", "application/json");
+        xhr.onload = function () {
+          console.log("Signed in as: " + xhr.responseText);
+          if (xhr.responseText == "success") {
+            signOut();
+            location.assign("/");
+          }
+        };
+        // Kita kirim dalam bentuk JSON dan stringify agar bisa dikirim
+        xhr.send(JSON.stringify({ token: id_token }));
+      }
+
+      function signOut() {
+        var auth2 = gapi.auth2.getAuthInstance();
+        auth2.signOut().then(function () {
+          console.log("User signed out.");
+        });
+      }
+    </script>
+  </body>
+</html>
