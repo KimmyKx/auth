@@ -15,19 +15,20 @@
       <header>
         <span><%= user.name %></span>
         <h1>Bootcamp chat app</h1>
-        <a href="/logout">Sign Out</a>
+        <span><a href="/logout">Sign Out</a></span>
       </header>
       <div class="chat">
 
         <div class="inner">
           <ul></ul>
-        <div class="inner">
+        
 
         <div class="send">
           <form>
             <input type="text" id="text" autocomplete="off">
             <button type="submit" id="send">Send</button>
           </form>
+        </div>
         </div>
         
       </div>
@@ -50,5 +51,9 @@
 </script>
 
 <script src="https://cdn.socket.io/4.4.0/socket.io.min.js" integrity="sha384-1fOn6VtTq3PWwfsOrk45LnYcGosJwzMHv+Xh/Jx5303FVOXzEnw0EpLv30mtjmlj" crossorigin="anonymous"></script>
+<script type="module">
+  //import { formatRelative, subDays } from './datefns'
+  //console.log(formatRelative(subDays(new Date(), 0), new Date()))
+</script>
 <script src="/js/index.js"></script>
 </html>

@@ -4,6 +4,7 @@ const app = express();
 const http = require('http').createServer(app)
 const { Database } = require('quickmongo')
 const socketio = require('socket.io')
+const { formatRelative, subDays }= require('date-fns')
 const io = socketio(http, {
     cors: { origin: "*"}
 })
@@ -16,7 +17,7 @@ let _user = {}
 // Google Auth
 const { OAuth2Client } = require("google-auth-library");
 const CLIENT_ID =
-  "431330319013-7tkh8ltj18hke4c5rs3b74v5pphikc4t.apps.googleusercontent.com";
+  process.env["CLIENT_ID"];
 const client = new OAuth2Client(CLIENT_ID);
 
 // Middleware
@@ -30,6 +31,12 @@ app.get("/login", (req, res) => {
 });
 
 
+// Prototype
+String.prototype.toCapitalize = function() {
+  const up = this.charAt(0).toUpperCase()
+  return up + this.slice(1)
+}
+
 // Backend app
 db.on('ready', async () => {
   console.log('Database connected')
@@ -41,13 +48,9 @@ io.on('connection', async (socket) => {
   if(!msg) await db.set('messages', [])
 
   socket.on('message', async (message) => {
-    if(message.author.name != _user.name || message.author.id != _user.id || message.author.email != _user.email) {
-      app.get('/', (req, res) => {
-        res.redirect('/logout')
-      })
-      return
-    }
+    console.log('message sent')
     await db.push(`messages`, message)
+    message._unreal = formatRelative(subDays(message.createdAt, 0), new Date()).toCapitalize()
     io.emit('message', message)
   })
 })
@@ -82,6 +85,8 @@ app.get("/", checkAuthenticated, async (req, res) => {
   _user.email = req.user.email;
   _user.id = req.user.id;
   let msgs = req.msgs;
+  if(msgs)
+  msgs.forEach(msg => msg.createdAt = formatRelative(subDays(msg.createdAt, 0), new Date()).toCapitalize())
   res.render("index", { user: user, msgs: msgs });
 });
 
@@ -113,8 +118,8 @@ function checkAuthenticated(req, res, next) {
         user.email = payload.email;
         user.picture = payload.picture;
         user.id = generateID(15);
-        user.createdAt = Date.now();
-        user.lastLogged = Date.now();
+        user.createdAt = new Date;
+        user.lastLogged = new Date;
         await db.set(`user_${user.email}`, user);
     } else {
         const userInfo = await db.get(`user_${payload.email}`)
@@ -153,3 +158,5 @@ function generateID(length){
 http.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
+
+
