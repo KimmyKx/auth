@@ -4,7 +4,7 @@ const app = express();
 const http = require('http').createServer(app)
 const { Database } = require('quickmongo')
 const socketio = require('socket.io')
-const { formatRelative, subDays }= require('date-fns')
+const { formatRelative, subDays } = require('date-fns')
 const io = socketio(http, {
     cors: { origin: "*"}
 })
@@ -48,7 +48,8 @@ io.on('connection', async (socket) => {
   if(!msg) await db.set('messages', [])
 
   socket.on('message', async (message) => {
-    console.log('message sent')
+    message.createdAt = new Date
+    if(!message.createdAt) return
     await db.push(`messages`, message)
     message._unreal = formatRelative(subDays(message.createdAt, 0), new Date()).toCapitalize()
     io.emit('message', message)
@@ -111,8 +112,8 @@ function checkAuthenticated(req, res, next) {
 
     const payload = ticket.getPayload();
    
-
-    const isAvailable = await db.get(`user_${payload.email}`);
+    const useremail = payload.email.replace(/@gmail.com/, `@gmail_com`)
+    const isAvailable = await db.get(`user_${useremail}`);
     if(!isAvailable){
         user.name = payload.name;
         user.email = payload.email;
@@ -120,17 +121,18 @@ function checkAuthenticated(req, res, next) {
         user.id = generateID(15);
         user.createdAt = new Date;
         user.lastLogged = new Date;
-        await db.set(`user_${user.email}`, user);
+        console.log(`${user.name} has registered`)
+        await db.set(`user_${useremail}`, user);
     } else {
-        const userInfo = await db.get(`user_${payload.email}`)
+        const userInfo = await db.get(`user_${useremail}`)
         user.name = userInfo.name
         user.email = userInfo.email
         user.picture = userInfo.picture
         user.id = userInfo.id
         user.createdAt = userInfo.createdAt
         user.lastLogged = userInfo.lastLogged
+        console.log(`${user.name} has logged in`)
     }
-    
   }
   verify()
     .then(async () => {
@@ -140,7 +142,6 @@ function checkAuthenticated(req, res, next) {
       next();
     })
     .catch((err) => {
-      // console.log(err);
       res.redirect("/login");
     });
 }
