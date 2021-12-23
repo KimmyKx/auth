@@ -51,6 +51,10 @@ body {
   width: 0;
 }
 
+.subtract {
+  z-index: 999;
+}
+
 .content ul {
   width: 100%;
   display: flex;

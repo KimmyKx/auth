@@ -17,6 +17,7 @@
         <h1>Bootcamp chat app</h1>
         <span><a href="/logout">Sign Out</a></span>
       </header>
+      
       <div class="chat">
 
         <div class="inner">
@@ -40,7 +41,7 @@
 <script type="text/javascript">
   const username = "<%= user.name  %>"
   const email = "<%= user.email %>"
-  const id = "<%= user.id %>"
+  const id = "<%= user.userID %>"
   const picture = "<%= user.picture%>"
   function htmlDecode(input){
     const e = document.createElement("div")
@@ -51,9 +52,5 @@
 </script>
 
 <script src="https://cdn.socket.io/4.4.0/socket.io.min.js" integrity="sha384-1fOn6VtTq3PWwfsOrk45LnYcGosJwzMHv+Xh/Jx5303FVOXzEnw0EpLv30mtjmlj" crossorigin="anonymous"></script>
-<script type="module">
-  //import { formatRelative, subDays } from './datefns'
-  //console.log(formatRelative(subDays(new Date(), 0), new Date()))
-</script>
 <script src="/js/index.js"></script>
 </html>

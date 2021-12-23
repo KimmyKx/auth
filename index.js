@@ -1,18 +1,23 @@
-const cookieParser = require("cookie-parser");
-const express = require("express");
-const app = express();
+const cookieParser = require("cookie-parser")
+const express = require("express")
+const app = express()
 const http = require('http').createServer(app)
-const { Database } = require('quickmongo')
 const socketio = require('socket.io')
 const { formatRelative, subDays } = require('date-fns')
 const io = socketio(http, {
     cors: { origin: "*"}
 })
-const db = new Database(process.env['mongo'])
-const PORT = process.env.PORT || 3000;
-
-// _REAL
+const PORT = process.env.PORT || 3000
 let _user = {}
+
+// DBMS MongoDB
+// const { Collection } = require('quickmongo')
+
+let ms
+
+const { Database } = require('./Schema/utils')
+const db = new Database()
+
 
 // Google Auth
 const { OAuth2Client } = require("google-auth-library");
@@ -37,23 +42,33 @@ String.prototype.toCapitalize = function() {
   return up + this.slice(1)
 }
 
-// Backend app
-db.on('ready', async () => {
-  console.log('Database connected')
-})
+async function funn(){
+  await db.pull('ID', 'messages', { message: { id: "msgID"}})
+  const msg = await db.find("ID", "messages")
+
+  console.log(msg)
+}
 
 io.on('connection', async (socket) => {
   console.log('a user connected')
-  const msg = await db.get('messages')
-  if(!msg) await db.set('messages', [])
 
+  const msg = await db.find('ID', 'messages')
+  if(!msg) await db.insert({ID: "message", message: []})
+  
   socket.on('message', async (message) => {
     message.createdAt = new Date
     if(!message.createdAt) return
-    await db.push(`messages`, message)
+    await db.push('ID', 'messages', { message: message })
     message._unreal = formatRelative(subDays(message.createdAt, 0), new Date()).toCapitalize()
     io.emit('message', message)
   })
+
+  socket.on('messageDelete', async (messageID) => {
+    if(!messageID) return
+    //await db.pull('ID', 'messages', {message: { id: messageID}})
+    io.emit('messageDelete', messageID)
+  })
+
 })
 
 
@@ -87,8 +102,8 @@ app.get("/", checkAuthenticated, async (req, res) => {
   _user.id = req.user.id;
   let msgs = req.msgs;
   if(msgs)
-  msgs.forEach(msg => msg.createdAt = formatRelative(subDays(msg.createdAt, 0), new Date()).toCapitalize())
-  res.render("index", { user: user, msgs: msgs });
+  msgs.message.forEach(time => time.createdAt = formatRelative(subDays(time.createdAt, 0), new Date()).toCapitalize())
+  res.render("index", { user: user, msgs: msgs});
 });
 
 app.get("/logout", (req, res) => {
@@ -112,23 +127,24 @@ function checkAuthenticated(req, res, next) {
 
     const payload = ticket.getPayload();
    
-    const useremail = payload.email.replace(/@gmail.com/, `@gmail_com`)
-    const isAvailable = await db.get(`user_${useremail}`);
+    const isAvailable = await db.find(`ID`, `${payload.email}`);
     if(!isAvailable){
+        user.ID = payload.email;
         user.name = payload.name;
         user.email = payload.email;
         user.picture = payload.picture;
-        user.id = generateID(15);
+        user.userID = generateID(15);
         user.createdAt = new Date;
         user.lastLogged = new Date;
+        await db.insert(user)
         console.log(`${user.name} has registered`)
-        await db.set(`user_${useremail}`, user);
     } else {
-        const userInfo = await db.get(`user_${useremail}`)
+        const userInfo = await db.find(`ID`, payload.email)
+        user.ID = userInfo.email;
         user.name = userInfo.name
         user.email = userInfo.email
         user.picture = userInfo.picture
-        user.id = userInfo.id
+        user.userID = userInfo.userID
         user.createdAt = userInfo.createdAt
         user.lastLogged = userInfo.lastLogged
         console.log(`${user.name} has logged in`)
@@ -136,7 +152,7 @@ function checkAuthenticated(req, res, next) {
   }
   verify()
     .then(async () => {
-      const msgs = await db.get('messages')
+      const msgs = await db.find('ID', 'messages')
       req.user = user;
       req.msgs = msgs;
       next();
@@ -160,4 +176,4 @@ http.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
 
-
+module.exports = ms
