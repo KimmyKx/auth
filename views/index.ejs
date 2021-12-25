@@ -6,7 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Main Page</title>
   <link rel="stylesheet" href="/css/style-index.css" />
-  <script>//window.addEventListener('contextmenu', e => e.preventDefault())</script>
+  <script>window.location.href = '/dashboard'</script>
 </head>
 
 <body>
@@ -17,7 +17,7 @@
         <h1>Bootcamp chat app</h1>
         <span><a href="/logout">Sign Out</a></span>
       </header>
-      
+
       <div class="chat">
 
         <div class="inner">
@@ -50,7 +50,6 @@
   }
   const msgs = <%- JSON.stringify(msgs) %>
 </script>
-
 <script src="https://cdn.socket.io/4.4.0/socket.io.min.js" integrity="sha384-1fOn6VtTq3PWwfsOrk45LnYcGosJwzMHv+Xh/Jx5303FVOXzEnw0EpLv30mtjmlj" crossorigin="anonymous"></script>
 <script src="/js/index.js"></script>
 </html>

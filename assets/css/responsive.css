@@ -1,0 +1,37 @@
+@media (max-width: 992px) {
+  div.sidebar {
+    left: -380px;
+  }
+  div.sidebar .menu-toggle {
+    display: block;
+  }
+  nav.navbar#navbar .profil-chat {
+    margin-left: 50px;
+    border-left: none;
+  }
+  nav.navbar#navbar .menu-toggle {
+    display: block;
+  }
+  div.container-chat {
+    padding-left: 10px;
+  }
+  .sidebar .head .icons {
+    margin-right: 20px;
+  }
+}
+
+@media (max-width: 576px) {
+  .container-chat .chattingan div.pesan-chat {
+    margin-left: 20%;
+  }
+  .container-chat .chattingan div.you {
+    max-width: 80%;
+  }
+  .container-chat .chattingan div.me {
+    max-width: 80%;
+  }
+  nav.navbar-bottom input.input-chat {
+    width: 500px;
+  }
+}
+/*# sourceMappingURL=responsive.css.map */

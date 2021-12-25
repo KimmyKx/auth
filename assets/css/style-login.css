@@ -3,8 +3,7 @@
   margin: 0;
   padding: 0;
   -webkit-box-sizing: border-box;
-  box-sizing: border-box;
-  text-decoration: none;
+          box-sizing: border-box;
 }
 
 body {
@@ -12,7 +11,6 @@ body {
   background-image: url(/images/background-image.jpg);
   background-size: cover;
   overflow-y: hidden;
-  background-color: #f0ece3;
 }
 
 .container {
@@ -32,22 +30,13 @@ body {
 
 .container .head h2 {
   color: #323232;
-  font-family: "Readex Pro", sans-serif;
+  font-family: 'Readex Pro', sans-serif;
   text-align: center;
   font-size: 20px;
 }
 
-.container .alert-error {
-  width: 80%;
-  margin: 20px auto 20px auto;
-  text-align: center;
-  background-color: #dc3444;
-  color: #f8f9fa;
-  font-size: 0.9rem;
-  padding: 20px;
-}
-
 .container .body {
+  padding-top: 30px;
   width: 80%;
   margin: auto;
 }
@@ -60,15 +49,15 @@ body {
   outline: none;
   border: 2px solid #bbb;
   border-radius: 5px;
-  -webkit-transition: 0.3s;
-  transition: 0.3s;
+  -webkit-transition: .3s;
+  transition: .3s;
 }
 
 .container .body input:focus {
   border-radius: 5px;
   border: 2px solid #ffae34;
   -webkit-box-shadow: 0px 0px 2px 4px rgba(255, 174, 52, 0.8);
-  box-shadow: 0px 0px 2px 4px rgba(255, 174, 52, 0.8);
+          box-shadow: 0px 0px 2px 4px rgba(255, 174, 52, 0.8);
 }
 
 .container .body button.input {
@@ -78,20 +67,13 @@ body {
   height: 40px;
   outline: none;
   border: none;
-  background: -webkit-gradient(
-    linear,
-    left top,
-    right top,
-    from(#00a5fd),
-    color-stop(#d100a8),
-    to(#00a5fd)
-  );
-  background: linear-gradient(to right, #00a5fd, #d100a8, #00a5fd);
+  background: -webkit-gradient(linear, left top, right top, from(#00A5FD), color-stop(#D100A8), to(#00A5FD));
+  background: linear-gradient(to right, #00A5FD, #D100A8, #00A5FD);
   color: #fff;
   font-size: 18px;
   background-size: 200%;
-  -webkit-transition: 0.5s;
-  transition: 0.5s;
+  -webkit-transition: .5s;
+  transition: .5s;
 }
 
 .container .body button.input:hover {
@@ -115,12 +97,36 @@ body {
   color: #005e91;
 }
 
-.container .g-signin2 {
-  width: 100% !important;
+.container .body div.btn-google {
+  border-radius: 5px;
+  margin-top: -40px;
+  width: 100%;
+  height: 40px;
+  outline: none;
+  border: none;
+  background: #cc0000;
+  color: #fff;
+  font-size: 16px;
+  background-size: 200%;
+  -webkit-transition: .5s;
+  transition: .5s;
   display: flex;
-  justify-content: center;
   align-items: center;
-  margin-top: 10px;
+  justify-content: center;
+}
+
+.container .body div.btn-google i {
+  padding-right: 15px;
+  border-right: 1px solid #fff;
+}
+
+.container .body div.btn-google span {
+  padding-left: 10px;
+}
+
+.container .body div.btn-google:hover {
+  background: #f30202;
+  cursor: pointer;
 }
 
 .container .body .or {
@@ -138,6 +144,16 @@ body {
   text-align: center;
 }
 
+.g-signin2 {
+  width: 100% !important;
+}
+
+.abcRioButton {
+  width: 100% !important;
+  height: 40px !important;
+  opacity: 0;
+}
+
 @media screen and (max-width: 992px) {
   .container {
     width: 45%;
@@ -153,11 +169,6 @@ body {
 @media screen and (max-width: 578px) {
   .container {
     width: 80%;
-  }
-}
-@media screen and (min-height: 550px) {
-  body {
-    height: 100vh;
   }
 }
 /*# sourceMappingURL=style-login.css.map */

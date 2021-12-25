@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
+
+    <!-- CSS Welcome Style -->
+    <link rel="stylesheet" href="/css/welcome-style.css">
+
+    <!-- SCRIPT JQUERY -->
+    <script src="/js/jquery-3.5.1.js"></script>
+
+    <!-- CSS Responsive -->
+    <link rel="stylesheet" href="/css/responsive.css">
+
+    <!-- CSS Style-tampilan-chat -->
+    <link rel="stylesheet" href="/css/style-tampilan-chat.css">
+
+    <!-- Icon Fontawesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css">
+
+    <!-- CSS Info User -->
+    <link rel="stylesheet" href="/css/style-data.css">
+
+</head>
+
+<body>
+
+    <nav class="navbar" id="navbar">
+
+        <!-- Profil Chat -->
+
+        <a href="#" class="check-data-user" style="text-decoration: none; color: #000;">
+            <div class="profil-chat">
+                <img src="<%= user.picture %>" alt="backgrond" class="profil">
+                <span><%= user.name  %></span>
+                <span></span>
+            </div>
+        </a>
+
+        <div class="menu-toggle">
+            <input type="checkbox" id="add">
+            <span class="fa fa-bars"></span>
+        </div>
+
+    </nav>
+
+    <div class="sidebar">
+
+        <div class="head">
+            <div class="prof">
+              <img src="<%= user.picture %>" alt="background" class="profil">
+              <span><%= user.name %></span>
+            </div>
+            <div class="dropdown">
+                <span class="fa fa-ellipsis-v icons"></span>
+
+                <div class="link-menu">
+                    <li>
+                        <a href="profile.html">Profile</a>
+                    </li>
+
+                    <li>
+                        <a id="grouping" style="pointer: cursor;">New Group<a>
+                    </li>            
+                    <li>
+                        <a href="/logout">Logout</a>
+                    </li>
+
+                </div>
+            </div>
+
+            <div class="menu-toggle">
+                <input type="checkbox" id="remove">
+                <span class="fa fa-times"></span>
+            </div>
+        </div>
+
+        <!-- Tempat sidebar Contact -->
+        <div class="body-contact">
+            <% group.forEach(gb => { %>
+            <div class="contactBar">
+                <input type="hidden" value="<%= gb.id %>">
+                <div class="card-contact">
+                    <a style="text-decoration: none; color: #000;">
+                        <img src="<%= gb.picture == "" ? '/images/profil-1.jpg' : gb.picture %>" alt="backgrond" class="profil-contact-chat">
+                        <p><%= gb.name %></p>
+                        <p>...</p>
+                    </a>
+                </div>
+            </div>
+            <% }) %>
+        </div>
+    </div>
+
+    <div class="sidebar-data-user" id="sidebar-data-user">
+
+        <div class="head">
+            <h2>Info User</h2>
+
+            <div class="data-toggle">
+                <input type="checkbox" id="kembali">
+                <span class="fa fa-times close"></span>
+            </div>
+        </div>
+
+        <!-- Tempat sidebar Contact -->
+        <div class="body">
+
+            <div class="image-data-user">
+                <img src="/images/profil-1.jpg" alt="Background" class="image-top">
+                <h4>Wahyudi Umar</h4>
+                <p>085394033118</p>
+            </div>
+
+            <div class="bio-user">
+                <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Iste laboriosam soluta praesentium? Optio
+                    debitis natus ducimus dolore beatae, cum sapiente!</p>
+            </div>
+
+        </div>
+    </div>
+
+    <div class="preloader">
+        <div class="loading">
+            <img src="/images/autoloading.png" width="200" style="margin-left: 10px;">
+            <p><i class="fa fa-spinner fa-spin"></i> Please Wait</p>
+        </div>
+    </div>
+
+    <!-- Tampilan Awalan Aplikasi Chat -->
+    <div class="tampilan-welcome" style="display: block;">
+
+        <div class="head-welcome">
+            <img src="/images/jaringan-icon.png" alt="" class="icons">
+        </div>
+
+        <div class="body-welcome">
+            <h1>Welcome to Chat Bootcamp</h1>
+            <p style="margin-top: 10px">Untuk terbuhung ke Chat Bootcamp, Pastikan jaringan anda dalam keadaan stabil!!
+            </p>
+        </div>
+
+        
+    </div>
+    <div class="container-chat" style="display: none;">
+
+        <div class="chattingan">
+          <ul>
+          </ul>
+        </div>
+
+        <nav class="navbar-bottom">
+            
+            <div class="tag-input">
+                  <textarea type="text" id="message" class="input-chat" rows="5" cols="5" placeholder="Send message.."></textarea>
+                  <button class="send" id="send"><span class="fa fa-paper-plane"></span></button>
+            </div>
+
+        </nav>
+    </div>
+    
+    <div class="newGroup">
+        <div class="content">
+          <h3>New group</h3>
+          <input type="text" id="groupName" placeholder="Name..">
+          <div class="btns">
+            <button id="newGroup">Create</button>
+            <button id="cancel" style="background-color: tomato;">Cancel</button>
+          </div>
+        </div>
+    </div>
+    
+    <script src="https://cdn.socket.io/4.4.0/socket.io.min.js" integrity="sha384-1fOn6VtTq3PWwfsOrk45LnYcGosJwzMHv+Xh/Jx5303FVOXzEnw0EpLv30mtjmlj" crossorigin="anonymous"></script>
+    
+    <script src="/js/main.js"></script>
+    <script type="text/javascript">
+      const _username = "<%= user.name  %>"
+      const _email = "<%= user.email %>"
+      const userid = "<%= user.userID %>"
+      const _picture = "<%= user.picture%>"
+    </script>
+    <script src="/js/dashboard.js"></script>
+    <script type="text/javascript">
+    $(document).ready(function() {
+        $(".preloader").fadeOut();
+    })
+    </script>
+</body>
+
+</html>

@@ -9,8 +9,6 @@
       name="google-signin-client_id"
       content="431330319013-7tkh8ltj18hke4c5rs3b74v5pphikc4t.apps.googleusercontent.com"
     />
-    <!-- Style CSS -->
-    <link rel="stylesheet" href="/css/style-login.css" />
     <!-- Icon Fontawesome -->
     <link
       rel="stylesheet"
@@ -18,57 +16,52 @@
       integrity="sha384-AYmEC3Yw5cVb3ZcuHtOA93w35dYTsvhLPVnYs9eStHfGJvOvKxVfELGroGkvsg+p"
       crossorigin="anonymous"
     />
+    <!-- Style CSS -->
+    <link rel="stylesheet" href="/css/style-login.css" />
     <title>Chat Bootcamp Login Auth</title>
   </head>
   <body>
-    <div class="container">
-      <div class="head">
-        <h2>Selamat Datang Di Chat Bootcamp</h2>
-      </div>
+<div class="container">
 
-      <!-- <div class="alert-error" role="alert"></div> -->
-
-      <div class="body">
-        <!-- Tag form untuk mengakses email dan password -->
-        <form action="" method="POST">
-          <!-- Input Email -->
-          <input
-            type="email"
-            name="email"
-            class="noTelepon"
-            placeholder="Currently disabled"
-            disabled
-          />
-
-          <!-- Input Password -->
-          <input
-            type="password"
-            name="password"
-            class="password"
-            placeholder="Currently disabled"
-            disabled
-          />
-
-          <!-- Tombol Input -->
-          <button disabled type="submit" name="login" class="input">Login</button>
-        </form>
-
-        <div class="or">
-          <p>atau</p>
+        <div class="head">
+            <h2>Selamat Datang Di Chat Bootcamp</h2>
         </div>
 
-        <!-- Kotak Login Google -->
-        <div class="g-signin2" data-onsuccess="onSignIn"></div>
+        <div class="body">
 
-        <!-- Footer -->
-        <footer>
-          <p>
-            Belum mempunyai akun?
-            <a class="footer">Sign Up</a>
-          </p>
-        </footer>
-      </div>
+            
+            <form action="" method="post">
+
+                
+                <input type="number" name="" class="noTelepon" disabled placeholder="Masukkan Nomor Telepon Anda...">
+
+                
+                <input type="password" name="" class="password" disabled placeholder="Masukkan Password Anda...">
+
+                
+                <button disabled class="input">Login</button>
+            </form>
+
+            <div class="or">
+                <p>or</p>
+            </div>
+
+            <form action="" method="post">
+
+                <div class="g-signin2" data-onsuccess="onSignIn"></div>
+                <div class="btn-google"><i class="fab fa-google-plus-g"></i> <span>Login dengan Google</span></div>
+
+            </form>
+
+            
+            <footer>
+                <p>Don't have a username yet? <a href="registrasi.html" class="footer">Sign Up</a></p>
+            </footer>
+        </div>
+
     </div>
+        <!-- Kotak Login Google -->
+    <!--<div class="g-signin2" data-onsuccess="onSignIn"></div>--> 
 
     <!-- Ketika user login menggunakan google account -->
     <script>

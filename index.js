@@ -11,13 +11,8 @@ const PORT = process.env.PORT || 3000
 let _user = {}
 
 // DBMS MongoDB
-// const { Collection } = require('quickmongo')
-
-let ms
-
 const { Database } = require('./Schema/utils')
 const db = new Database()
-
 
 // Google Auth
 const { OAuth2Client } = require("google-auth-library");
@@ -45,28 +40,54 @@ String.prototype.toCapitalize = function() {
 async function funn(){
   await db.pull('ID', 'messages', { message: { id: "msgID"}})
   const msg = await db.find("ID", "messages")
-
   console.log(msg)
 }
 
 io.on('connection', async (socket) => {
   console.log('a user connected')
 
-  const msg = await db.find('ID', 'messages')
-  if(!msg) await db.insert({ID: "message", message: []})
+  // const msg = await db.find('ID', 'messages')
+  // if(!msg) await db.insert({ID: "message", message: []})
   
-  socket.on('message', async (message) => {
-    message.createdAt = new Date
+  socket.on('message', async (messaged) => {
+    const message = {
+      content: messaged.content,
+      id: generateID(15),
+      timestamp: Date.now(),
+      createdAt: new Date(),
+      author: messaged.author
+    }
+    
     if(!message.createdAt) return
-    await db.push('ID', 'messages', { message: message })
+    await db.push('id', `${messaged.reciever}`, { messages: message })
     message._unreal = formatRelative(subDays(message.createdAt, 0), new Date()).toCapitalize()
     io.emit('message', message)
   })
 
   socket.on('messageDelete', async (messageID) => {
     if(!messageID) return
-    //await db.pull('ID', 'messages', {message: { id: messageID}})
+    await db.pull('ID', 'messages', {message: { id: messageID}})
     io.emit('messageDelete', messageID)
+  })
+
+  socket.on('newgroup', async gbName => {
+    const obj = {
+      ID: 'group',
+      creator: {
+        id: _user.id,
+        username: _user.name,
+        email: _user.email
+      },
+      timestamp: Date.now(),
+      createdAt: new Date(),
+      id: generateID(10),
+      name: `${gbName}`,
+      picture: '',
+      messages: []
+    }
+    await db.push(`email`, `${_user.email}`, { group: `${obj.id}` })
+    await db.insert(obj)
+    io.emit('newgroup', obj)
   })
 
 })
@@ -94,17 +115,41 @@ app.post("/login", (req, res) => {
     // .catch(console.error);
 });
 
-app.get("/", checkAuthenticated, async (req, res) => {
+app.post("/dashboard", (req, res) => {
+  const id = req.body.id
+  const group = db.find('id', id).then(result => {
+    result._realuser = _user
+    result.messages.forEach(message => message.createdAt = formatRelative(subDays(message.createdAt, 0), new Date()).toCapitalize())
+    res.send(result)
+  })
+})
 
+app.get("/", checkAuthenticated, async (req, res) => {
   let user = req.user;
-  _user.name = req.user.name;
-  _user.email = req.user.email;
-  _user.id = req.user.id;
   let msgs = req.msgs;
   if(msgs)
   msgs.message.forEach(time => time.createdAt = formatRelative(subDays(time.createdAt, 0), new Date()).toCapitalize())
   res.render("index", { user: user, msgs: msgs});
 });
+
+
+app.get("/dashboard", checkAuthenticated, async (req, res) => {
+  let user = req.user;
+  const groups = []
+  const promises = req.user.group.map(gb => {
+    groups.push(gb)
+    return db.find(`id`, `${gb}`)
+  })
+  const group = Promise.all(promises).then(result => {
+    const pre = []
+    for(let i = 0; i < result.length; i++){
+      if(!result[i]) db.pull('userID', _user.id, { group: groups[i] })
+      else pre.push(result[i])
+    }
+    return pre
+  })
+  res.render('dashboard', { user: user, group: await group })
+})
 
 app.get("/logout", (req, res) => {
   res.clearCookie("session-token");
@@ -114,6 +159,7 @@ app.get("/logout", (req, res) => {
 app.get("/registrasi", (req, res) => {
   res.render("registrasi");
 });
+
 
 function checkAuthenticated(req, res, next) {
   let token = req.cookies["session-token"];
@@ -127,26 +173,29 @@ function checkAuthenticated(req, res, next) {
 
     const payload = ticket.getPayload();
    
-    const isAvailable = await db.find(`ID`, `${payload.email}`);
-    if(!isAvailable){
-        user.ID = payload.email;
+    const userInfo = await db.find(`email`, payload.email);
+    if(!userInfo){
+        user.ID = 'user';
         user.name = payload.name;
         user.email = payload.email;
         user.picture = payload.picture;
         user.userID = generateID(15);
         user.createdAt = new Date;
         user.lastLogged = new Date;
+        user.timestamp = Date.now();
+        user.group = ["yBcKveyska"];
         await db.insert(user)
         console.log(`${user.name} has registered`)
     } else {
-        const userInfo = await db.find(`ID`, payload.email)
-        user.ID = userInfo.email;
+        user.ID = userInfo.ID
         user.name = userInfo.name
         user.email = userInfo.email
         user.picture = userInfo.picture
         user.userID = userInfo.userID
         user.createdAt = userInfo.createdAt
         user.lastLogged = userInfo.lastLogged
+        user.timestamp = Date.now();
+        user.group = userInfo.group
         console.log(`${user.name} has logged in`)
     }
   }
@@ -155,6 +204,10 @@ function checkAuthenticated(req, res, next) {
       const msgs = await db.find('ID', 'messages')
       req.user = user;
       req.msgs = msgs;
+      _user.name = user.name;
+      _user.email = user.email;
+      _user.id = user.userID;
+      _user.picture = user.picture;
       next();
     })
     .catch((err) => {
@@ -175,5 +228,3 @@ function generateID(length){
 http.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
-
-module.exports = ms
