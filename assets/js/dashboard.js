@@ -1,5 +1,5 @@
 const socket = io()
-const _date = []
+let _date = []
 
 socket.on('newgroup', info => {
 
@@ -141,6 +141,7 @@ document.querySelector('.body-contact').addEventListener('click', e => {
 })
 
 
+
 // Kirim id chat ke node
 function posted(id){
     const xhr = new XMLHttpRequest()
@@ -251,6 +252,7 @@ const send = document.getElementById('send').onclick = () => {
  */
 function addNewText(message){
     let who = ''
+    _date = []
     message.forEach(message => {
       const el = document.createElement('li')
       const _dated = message.createdAt.split(' at ')
