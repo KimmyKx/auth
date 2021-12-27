@@ -25,24 +25,29 @@ nav.navbar .menu-toggle {
   position: absolute;
   left: 0;
   display: none;
-  top: 23px;
-  margin-left: 20px;
+  top: 0px;
+  height: calc(100% - 10px);
+  width: 100px;
 }
 
 nav.navbar .menu-toggle input {
   -webkit-transform: scale(1.5);
           transform: scale(1.5);
   opacity: 0;
+  width: 100%;
+  height: 100%;
   position: absolute;
   top: 5px;
   left: 4px;
-  z-index: 1;
+  z-index: 99;
   outline: none;
 }
 
 nav.navbar .menu-toggle span {
   font-size: 24px;
   color: #fff;
+  margin-left: 25px;
+  margin-top: 25px;
 }
 
 nav.navbar .profil-chat {
@@ -192,8 +197,7 @@ nav.navbar .profil-chat span:last-child {
 }
 
 .sidebar .body-contact {
-  margin-top: 30px;
-  padding-left: 10px;
+  margin-top: 10px;
 }
 
 .sidebar .body-contact .card-contact {
@@ -232,9 +236,7 @@ nav.navbar .profil-chat span:last-child {
 }
 
 .container-chat .chat-first {
-  padding-left: 10px;
   width: 160px;
-  margin-left: 40%;
   border-radius: 5px;
   padding: 10px 10px;
   background: rgba(242, 255, 0, 0.8);

@@ -22,6 +22,10 @@
     <!-- Icon Fontawesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css">
 
+    <link rel="stylesheet" href="/css/style-profile.css">
+
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+
     <!-- CSS Info User -->
     <link rel="stylesheet" href="/css/style-data.css">
 
@@ -33,7 +37,7 @@
 
         <!-- Profil Chat -->
 
-        <a href="#" class="check-data-user" style="text-decoration: none; color: #000;">
+        <a class="check-data-user" style="text-decoration: none; color: #000; cursor: pointer;">
             <div class="profil-chat">
                 <img src="<%= user.picture %>" alt="backgrond" class="profil">
                 <span><%= user.name  %></span>
@@ -52,20 +56,31 @@
 
         <div class="head">
             <div class="prof">
+            
               <img src="<%= user.picture %>" alt="background" class="profil">
-              <span><%= user.name %></span>
+              <div class="colled">
+
+                  <span><%= user.name %></span>
+                  <span><%= user.description %></span>
+                  
+              </div>
             </div>
             <div class="dropdown">
                 <span class="fa fa-ellipsis-v icons"></span>
 
                 <div class="link-menu">
                     <li>
-                        <a href="profile.html">Profile</a>
+                        <a id="profile-btn">Profile</a>
                     </li>
 
                     <li>
                         <a id="grouping" style="pointer: cursor;">New Group<a>
-                    </li>            
+                    </li>
+
+                    <li>
+                        <a id="join" style="pointer: cursor;">Join Group<a>
+                    </li>
+
                     <li>
                         <a href="/logout">Logout</a>
                     </li>
@@ -99,7 +114,7 @@
     <div class="sidebar-data-user" id="sidebar-data-user">
 
         <div class="head">
-            <h2>Info User</h2>
+            <h2>User Info</h2>
 
             <div class="data-toggle">
                 <input type="checkbox" id="kembali">
@@ -111,20 +126,19 @@
         <div class="body">
 
             <div class="image-data-user">
-                <img src="/images/profil-1.jpg" alt="Background" class="image-top">
-                <h4>Wahyudi Umar</h4>
-                <p>085394033118</p>
+                <img src="<%= user.picture %>" alt="Background" class="image-top">
+                <h4><%= user.name %></h4>
+                <p><%= user.email %></p>
             </div>
 
             <div class="bio-user">
-                <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Iste laboriosam soluta praesentium? Optio
-                    debitis natus ducimus dolore beatae, cum sapiente!</p>
+                <p><%= !user.description ? "No description" : user.description %></p>
             </div>
 
         </div>
     </div>
 
-    <div class="preloader">
+    <div class="preloader" stlye="z-index: 9999">
         <div class="loading">
             <img src="/images/autoloading.png" width="200" style="margin-left: 10px;">
             <p><i class="fa fa-spinner fa-spin"></i> Please Wait</p>
@@ -173,22 +187,108 @@
           </div>
         </div>
     </div>
-    
+
+    <div class="joinGroup">
+        <div class="content">
+          <h3>Join group</h3>
+          <input type-"text" id="linkid" placeholder="Link">
+          <div class="btns">
+            <button id="joinGroup">Join</button>
+            <button id="cancel-j" style="background-color: tomato;">Cancel</button>
+          </div>
+        </div>
+    </div>
+
+    <div class="view-profile">
+        <div class="content">
+
+            <div class="loading"><i class="fa fa-spinner fa-spin"></i> &ThickSpace; Please Wait</div>
+            
+            <div class="loaded">
+                <div class="fill">
+                  <img src="/images/dummy.png" alt="" width="100" />
+                  
+                  <div class="info">
+                      <p><strong>Kimmy</strong></p>
+                      <span class="viewbio">No bio</span>
+                      <span class="age"></span>
+                  </div>
+
+                  <i class="fas fa-times"></i>
+                </div>
+
+                <div class="option">
+                    <ul>
+                        <li class="private">
+                            <i class="fas fa-comments"></i>
+                            <span>Message</span>
+                        </li>
+                        <li>
+                            <i class="fas fa-user-friends"></i>
+                            <span>Add as friend</span>
+                        </li>
+                        <li>
+                            <i class="fas fa-phone"></i>
+                            <span>Call</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <div class="container-profile" data-aos="zoom-in-up" data-aos-duration="1000">
+        <div class="head">
+            <h2>Edit Profile</h2>
+        </div>
+
+        <div class="body">
+
+            <form action="" method="post" id="edit" enctype="multipart/form-data">
+
+                <!-- Profile Edit -->
+                <div class="image">
+                    <input type="file" name="image" id="image" style="display: none">
+
+                    <label for="image">
+                        <img src="<%= user.picture %>" alt="Profile">
+                    </label>
+                </div>
+
+                <!-- Username -->
+                <label for="username">Username</label>
+                <input type="text" name="username" class="data-edit" id="username" placeholder="Username..."
+                    maxlength="70" required value="<%= user.name %>">
+
+                <!-- Bio -->
+                <label for="Bio">Bio</label>
+                <textarea type="text" name="Bio" class="data-edit" id="Bio" placeholder="Bio....." maxlength="200"
+                    style="padding-top: 10px; padding-bottom: 10px;" rows="30" colls="4"><%= user.description %></textarea>
+                <!-- Tombol -->
+                <div class="tombol">
+                    <button class="button-submit">Update Data</button>
+                </div>
+
+            </form>
+
+        </div>
+    </div>
+
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
     <script src="https://cdn.socket.io/4.4.0/socket.io.min.js" integrity="sha384-1fOn6VtTq3PWwfsOrk45LnYcGosJwzMHv+Xh/Jx5303FVOXzEnw0EpLv30mtjmlj" crossorigin="anonymous"></script>
-    
     <script src="/js/main.js"></script>
     <script type="text/javascript">
       const _username = "<%= user.name  %>"
       const _email = "<%= user.email %>"
       const userid = "<%= user.userID %>"
       const _picture = "<%= user.picture%>"
+      AOS.init();
+      $(document).ready(function() {
+          $(".preloader").fadeOut();
+      })
     </script>
     <script src="/js/dashboard.js"></script>
-    <script type="text/javascript">
-    $(document).ready(function() {
-        $(".preloader").fadeOut();
-    })
-    </script>
 </body>
 
 </html>

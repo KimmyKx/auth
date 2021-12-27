@@ -3,6 +3,7 @@ const express = require("express")
 const app = express()
 const http = require('http').createServer(app)
 const socketio = require('socket.io')
+const ms = require('pretty-ms')
 const { formatRelative, subDays } = require('date-fns')
 const io = socketio(http, {
     cors: { origin: "*"}
@@ -11,7 +12,7 @@ const PORT = process.env.PORT || 3000
 let _user = {}
 
 // DBMS MongoDB
-const { Database } = require('./Schema/utils')
+const { Database } = require('./lib/db')
 const db = new Database()
 
 // Google Auth
@@ -25,7 +26,6 @@ app.set("view engine", "ejs");
 app.use(express.json());
 app.use(cookieParser());
 app.use(express.static(__dirname + "/assets"));
-
 app.get("/login", (req, res) => {
   res.render("login");
 });
@@ -38,16 +38,12 @@ String.prototype.toCapitalize = function() {
 }
 
 async function funn(){
-  await db.pull('ID', 'messages', { message: { id: "msgID"}})
-  const msg = await db.find("ID", "messages")
+  const msg = await db.find("group", ["NJVuVhTH4R","yBcKveyska"], true)
   console.log(msg)
 }
 
 io.on('connection', async (socket) => {
   console.log('a user connected')
-
-  // const msg = await db.find('ID', 'messages')
-  // if(!msg) await db.insert({ID: "message", message: []})
   
   socket.on('message', async (messaged) => {
     const message = {
@@ -61,7 +57,7 @@ io.on('connection', async (socket) => {
     if(!message.createdAt) return
     await db.push('id', `${messaged.reciever}`, { messages: message })
     message._unreal = formatRelative(subDays(message.createdAt, 0), new Date()).toCapitalize()
-    io.emit('message', message)
+    io.emit('message', message, messaged.reciever)
   })
 
   socket.on('messageDelete', async (messageID) => {
@@ -70,26 +66,36 @@ io.on('connection', async (socket) => {
     io.emit('messageDelete', messageID)
   })
 
-  socket.on('newgroup', async gbName => {
+  socket.on('newgroup', async gbInfo => {
     const obj = {
       ID: 'group',
       creator: {
-        id: _user.id,
-        username: _user.name,
-        email: _user.email
+        id: gbInfo.userid,
+        username: gbInfo.username,
+        email: gbInfo.email
       },
       timestamp: Date.now(),
       createdAt: new Date(),
       id: generateID(10),
-      name: `${gbName}`,
+      name: `${gbInfo.gbName}`,
       picture: '',
       messages: []
     }
-    await db.push(`email`, `${_user.email}`, { group: `${obj.id}` })
+    await db.push(`email`, `${gbInfo.email}`, { group: `${obj.id}` })
     await db.insert(obj)
     io.emit('newgroup', obj)
   })
 
+  socket.on('joingroup', async (link, userid) => {
+    const group = await db.find('id', link)
+    await db.pushOne('userID', userid, { group: `${link}` })
+    io.emit('joingroup', group, userid)
+  })
+
+  socket.on('userchange', async (changes) => {
+    await db.update('userID', changes.userid, { name: changes.userChange, description: changes.bio })
+  })
+  
 })
 
 
@@ -117,10 +123,47 @@ app.post("/login", (req, res) => {
 
 app.post("/dashboard", (req, res) => {
   const id = req.body.id
-  const group = db.find('id', id).then(result => {
-    result._realuser = _user
+  db.find('id', id).then(result => {
+    if(result.messages)
     result.messages.forEach(message => message.createdAt = formatRelative(subDays(message.createdAt, 0), new Date()).toCapitalize())
+
     res.send(result)
+  })
+})
+
+app.post("/viewprofile", (req, res) => {
+  const id = req.body.id
+  db.find('userID', id).then(info => {
+    if(!info) res.send(false)
+    const time = ms(Date.now() - info.timestamp).split(' ')
+    time.splice(time.length - 1, 1)
+    info.timestamp = time.join(' ')
+    res.send(info)
+  })
+})
+
+app.post("/privatemessage", (req, res) => {
+  const userid = req.body.id
+  const partner = req.body.partner
+  db.find('privateMembers', [userid, partner], true).then(result => {
+    if(!result){
+      db.insert({
+          ID: 'private',
+          privateMembers: [userid, partner],
+          messages: [],
+          createdAt: new Date(),
+          timestamp: Date.now(),
+          id: generateID(12)
+      }).then(() => {
+        db.find('privateMembers', [userid, partner], true).then(finn => {
+          finn.notInList = true
+          res.send(finn)
+        })
+      })
+    }
+    else { 
+      res.send(result)
+    }
   })
 })
 
@@ -148,6 +191,8 @@ app.get("/dashboard", checkAuthenticated, async (req, res) => {
     }
     return pre
   })
+  // const privateMessage = await db.find('privateMembers', [user.id], true)
+  // console.log(privateMessage)
   res.render('dashboard', { user: user, group: await group })
 })
 
@@ -174,6 +219,7 @@ function checkAuthenticated(req, res, next) {
     const payload = ticket.getPayload();
    
     const userInfo = await db.find(`email`, payload.email);
+    
     if(!userInfo){
         user.ID = 'user';
         user.name = payload.name;
@@ -184,9 +230,11 @@ function checkAuthenticated(req, res, next) {
         user.lastLogged = new Date;
         user.timestamp = Date.now();
         user.group = ["yBcKveyska"];
+        user.description = ''
         await db.insert(user)
         console.log(`${user.name} has registered`)
     } else {
+        
         user.ID = userInfo.ID
         user.name = userInfo.name
         user.email = userInfo.email
@@ -194,8 +242,9 @@ function checkAuthenticated(req, res, next) {
         user.userID = userInfo.userID
         user.createdAt = userInfo.createdAt
         user.lastLogged = userInfo.lastLogged
-        user.timestamp = Date.now();
+        user.timestamp = Date.now()
         user.group = userInfo.group
+        user.description = userInfo.description
         console.log(`${user.name} has logged in`)
     }
   }
