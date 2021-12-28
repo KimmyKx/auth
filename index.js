@@ -4,6 +4,7 @@ const app = express()
 const http = require('http').createServer(app)
 const socketio = require('socket.io')
 const ms = require('pretty-ms')
+const fileUpload = require('express-fileupload')
 const { formatRelative, subDays } = require('date-fns')
 const io = socketio(http, {
     cors: { origin: "*"}
@@ -17,17 +18,20 @@ const db = new Database()
 
 // Google Auth
 const { OAuth2Client } = require("google-auth-library");
-const CLIENT_ID = '431330319013-7tkh8ltj18hke4c5rs3b74v5pphikc4t.apps.googleusercontent.com'//process.env["CLIENT_ID"];
+const CLIENT_ID = "844648213687-9nnb31mbhk9ce48i8nntj2dfdvvp8t7t.apps.googleusercontent.com"
 const client = new OAuth2Client(CLIENT_ID);
 
 // Middleware
 app.set("view engine", "ejs");
+app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(cookieParser());
 app.use(express.static(__dirname + "/assets"));
+app.use(fileUpload());
 app.get("/login", (req, res) => {
   res.render("login");
 });
+
 
 
 // Prototype
@@ -122,13 +126,41 @@ app.post("/login", (req, res) => {
 });
 
 app.post("/dashboard", (req, res) => {
-  const id = req.body.id
-  db.find('id', id).then(result => {
-    if(result.messages)
-    result.messages.forEach(message => message.createdAt = formatRelative(subDays(message.createdAt, 0), new Date()).toCapitalize())
+  if(req.files){
+    const userid = req.body.userid
+    const file = req.files.upload
+    const validExt = ['png', 'jpg', 'jpeg']
+    const rename = file.name.split('.')
+    const extension = rename[rename.length - 1]
 
-    res.send(result)
+    if(file.size > 500000) return res.redirect('/dashboard')
+    if(!validExt.includes(extension)) return res.redirect('/dashboard')
+
+    const newName = generateID(15)
+    const result = `${newName}.${extension}`
+    file.name = result
+    file.mv(`${__dirname}/assets/profile/${file.name}`, async err => {
+      if(err) throw err
+      const currentImg = await db.find('userID', userid)
+      await db.update('userID', userid, {picture: `${file.name}`})
+      if(!currentImg.picture.startsWith('http')){
+        require('fs').unlink(__dirname + '/assets/profile/' + currentImg.picture, err => {
+          if(err) throw err
+        })
+      }
+      res.redirect('/dashboard')
+    })
+
+  }
+  else if(req.body.id){
+    const id = req.body.id
+    db.find('id', id).then(result => {
+      if(result.messages)
+      result.messages.forEach(message => message.createdAt = formatRelative(subDays(message.createdAt, 0), new Date()).toCapitalize())
+
+      res.send(result)
   })
+  }
 })
 
 app.post("/viewprofile", (req, res) => {
@@ -186,7 +218,7 @@ app.get("/dashboard", checkAuthenticated, async (req, res) => {
   const group = Promise.all(promises).then(result => {
     const pre = []
     for(let i = 0; i < result.length; i++){
-      if(!result[i]) db.pull('userID', _user.id, { group: groups[i] })
+      if(!result[i]) db.pull('userID', user.userID, { group: groups[i] })
       else pre.push(result[i])
     }
     return pre

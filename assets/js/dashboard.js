@@ -197,9 +197,6 @@ function privateMessage(id, partner){
       el.classList.add('contactBar')
     }
     console.log(response)
-    response.message.forEach(message => {
-
-    })
   }
   xhr.send(JSON.stringify({ id, partner }))
 }
@@ -219,7 +216,7 @@ function viewProfile(id){
   xhr.onload = () => {
     const info = JSON.parse(xhr.responseText)
     const profile = document.querySelector('.view-profile')
-    profile.querySelector('img').src = info.picture
+    profile.querySelector('img').src = info.picture.startsWith('https') || info.picture.startsWith('http') ? info.picture : '/profile/' + info.picture
     profile.querySelector('.info strong').textContent = info.name
     profile.querySelector('.info .viewbio').textContent = info.description
     profile.querySelector('.info .age').textContent = !info.timestamp ? 'Account age: few seconds ago' : `Account age: ${info.timestamp}`

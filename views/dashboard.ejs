@@ -39,7 +39,7 @@
 
         <a class="check-data-user" style="text-decoration: none; color: #000; cursor: pointer;">
             <div class="profil-chat">
-                <img src="<%= user.picture %>" alt="backgrond" class="profil">
+                <img src="<%= user.picture.startsWith('https') || user.picture.startsWith('http') ? user.picture : '/profile/' + user.picture %>" alt="backgrond" class="profil">
                 <span><%= user.name  %></span>
                 <span></span>
             </div>
@@ -57,7 +57,7 @@
         <div class="head">
             <div class="prof">
             
-              <img src="<%= user.picture %>" alt="background" class="profil">
+              <img src="<%= user.picture.startsWith('https') || user.picture.startsWith('http') ? user.picture : '/profile/' + user.picture %>" alt="background" class="profil">
               <div class="colled">
 
                   <span><%= user.name %></span>
@@ -126,7 +126,7 @@
         <div class="body">
 
             <div class="image-data-user">
-                <img src="<%= user.picture %>" alt="Background" class="image-top">
+                <img src="<%= user.picture.startsWith('https') || user.picture.startsWith('http') ? user.picture : '/profile/' + user.picture %>" alt="Background" class="image-top">
                 <h4><%= user.name %></h4>
                 <p><%= user.email %></p>
             </div>
@@ -245,17 +245,18 @@
 
         <div class="body">
 
-            <form action="" method="post" id="edit" enctype="multipart/form-data">
+            <form action="/dashboard" method="post" id="edit" enctype="multipart/form-data">
 
                 <!-- Profile Edit -->
                 <div class="image">
-                    <input type="file" name="image" id="image" style="display: none">
+                    <input type="hidden" name="userid" value="<%= user.userID %>">
+                    <input type="file" name="upload" id="image" style="display: none">
 
                     <label for="image">
-                        <img src="<%= user.picture %>" alt="Profile">
+                        <img src="<%= user.picture.startsWith('https') || user.picture.startsWith('http') ? user.picture : '/profile/' + user.picture %>" alt="Profile">
                     </label>
                 </div>
-
+                
                 <!-- Username -->
                 <label for="username">Username</label>
                 <input type="text" name="username" class="data-edit" id="username" placeholder="Username..."
