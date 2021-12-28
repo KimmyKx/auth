@@ -18,7 +18,7 @@ const db = new Database()
 
 // Google Auth
 const { OAuth2Client } = require("google-auth-library");
-const CLIENT_ID = "844648213687-9nnb31mbhk9ce48i8nntj2dfdvvp8t7t.apps.googleusercontent.com"
+const CLIENT_ID = "431330319013-7tkh8ltj18hke4c5rs3b74v5pphikc4t.apps.googleusercontent.com"
 const client = new OAuth2Client(CLIENT_ID);
 
 // Middleware
