@@ -32,8 +32,6 @@ app.get("/login", (req, res) => {
   res.render("login");
 });
 
-
-
 // Prototype
 String.prototype.toCapitalize = function() {
   const up = this.charAt(0).toUpperCase()
